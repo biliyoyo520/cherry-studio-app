@@ -3,7 +3,7 @@ name: Build & Release APK
 on:
   push:
     tags:
-      - 'v*'   # 推送 tag 时触发，例如 v1.0.0
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -18,16 +18,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'yarn'
+
+      - name: Enable Corepack (for Yarn 4.x)
+        run: corepack enable
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Install EAS CLI
-        run: yarn global add eas-cli
+        run: yarn dlx eas-cli@latest --version
 
       - name: Build APK with EAS
-        run: eas build --platform android --profile preview --non-interactive --output build.apk
+        run: yarn dlx eas-cli build --platform android --profile preview --non-interactive --output build.apk
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
