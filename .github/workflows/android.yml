@@ -3,7 +3,7 @@ name: Build & Release APK
 on:
   push:
     tags:
-      - 'v*'   # 推送 tag 时触发，例如 v1.0.0
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -28,8 +28,13 @@ jobs:
       - name: Install EAS CLI
         run: yarn dlx eas-cli@latest --version
 
-      - name: Build APK with EAS
-        run: yarn dlx eas-cli build --platform android --profile preview --non-interactive --output build.apk
+      - name: Trigger EAS build
+        run: yarn dlx eas-cli build --platform android --profile preview --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Download built APK
+        run: yarn dlx eas-cli build:download --latest --platform android --output build.apk
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
